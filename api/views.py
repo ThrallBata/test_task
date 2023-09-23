@@ -1,19 +1,14 @@
 from rest_framework import viewsets
 from django.utils import timezone
-from .models import Lesson
+from .models import Lesson, ViewerLesson
 from .serializers import UserLessonsSerializer, LessonSerializer
 
 
 # TODO смена стасуса
 class UserLessonsViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Lesson.objects.prefetch_related('viewers').all()
-    print(queryset.dates)
-    # for elem in queryset:
-    #     print(elem.viewers, 'elem')
-    #     for i in elem.viewers.all():
-    #         print(i.status)
+    queryset = ViewerLesson.objects.select_related('lesson').filter(user=1)
 
-    # print((queryset[0].viewers))
-    serializer_class = LessonSerializer
+    ''' Для упращения используется константа, при различных способах аутентификации user_id можно брать из токена или из request'''
 
-print(timezone.now())
+    serializer_class = UserLessonsSerializer
+

@@ -5,13 +5,7 @@ from .models import ViewerLesson, Lesson
 class UserLessonsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ViewerLesson
-        fields = ('user_id', 'duration_view',)
+        fields = ('user_id', 'lesson_id', 'duration_view', 'status', 'last_view')
 
 
-class LessonSerializer(serializers.ModelSerializer):
-    # viewerlesson = UserLessonsSerializer(read_only=True, many=True)
 
-    class Meta:
-        model = Lesson
-        fields = ('name', 'viewers')
-        # fields = ('__all__', 'viewerlesson',)
