@@ -33,9 +33,5 @@ class ViewerLesson(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE,)
     duration_view = models.IntegerField()
-
-    # if Lesson.objects.filter(viewers=lesson).duration * 0.8 <= int(duration_view):
-    #     status_view = "Просмотрено"
-    # TODO смена стасуса
     status = models.CharField(max_length=100, default="Не просмотрено")
     last_view = models.DateTimeField(default=timezone.now())

@@ -1,11 +1,12 @@
-from django.db.models import Sum, Count
+from django.db.models import Sum
+
 from rest_framework import viewsets, status
-from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Lesson, ViewerLesson, Product, User
 from .serializers import UserLessonsSerializer, ProductLessonsSerializer
+from .models import ViewerLesson, Product, User
+
 
 
 # TODO смена стасуса
@@ -21,19 +22,6 @@ class ProductLessonsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Product.objects.prefetch_related('lessons').filter(owners__name='Peter')
 
     serializer_class = ProductLessonsSerializer
-
-
-
-# a = Lesson.objects.all()
-# u = User.objects.all()
-# p=Product(name="C++")
-# p.save()
-# p.lessons.add(a[0], a[1])
-# p.owners.add(u[0], u[1])
-# p.save()
-
-
-
 
 
 @api_view(['GET'])
