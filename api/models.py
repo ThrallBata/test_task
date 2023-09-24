@@ -22,7 +22,7 @@ class Lesson(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    owner = models.CharField(max_length=100)
+    owners = models.ManyToManyField(User)
     lessons = models.ManyToManyField(Lesson)
 
     def __str__(self):
