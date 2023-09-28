@@ -34,7 +34,10 @@ class StatusLessonView(models.TextChoices):
 
 class ViewerLesson(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,)
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE,)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='views')
     duration_view = models.IntegerField()
     status = models.CharField(max_length=100, choices=StatusLessonView.choices, default=StatusLessonView.NO_VIEWED)
     last_view = models.DateTimeField(default=timezone.now())
+
+    class Meta:
+        unique_together = ('lesson', 'user')

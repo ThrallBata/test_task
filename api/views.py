@@ -1,18 +1,38 @@
-from django.db.models import Sum
+from django.db.models import Sum, FilteredRelation, Q, F
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .serializers import UserLessonsSerializer, ProductLessonsSerializer
-from .models import ViewerLesson, Product, User
+from .models import ViewerLesson, Product, User, ProductAccess, Lesson
 
 
-class UserLessonsViewSet(viewsets.ReadOnlyModelViewSet):
+class UserLessonsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = UserLessonsSerializer
 
     def get_queryset(self):
-        queryset = ViewerLesson.objects.select_related('lesson').filter(user=2)
+        # TODO передача user_id с помощью выбранного способа аутентификации
+
+        user_id = 1
+
+        accesses = ProductAccess.objects.filter(
+            user=user_id,
+            is_valid=True
+        )
+
+        queryset = Lesson.objects.filter(
+            products__in=accesses.values('product_id')
+        ).alias(
+            view_info=FilteredRelation(
+                'views',
+                condition=Q(views__user=user_id)
+            )
+        ).annotate(
+            status=F('view_info__status'),
+            duration_view=F('view_info__duration_view')
+        )
+        print(accesses)
         return queryset
 
 
