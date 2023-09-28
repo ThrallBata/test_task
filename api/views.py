@@ -8,20 +8,20 @@ from .serializers import UserLessonsSerializer, ProductLessonsSerializer
 from .models import ViewerLesson, Product, User
 
 
-
-# TODO смена стасуса
 class UserLessonsViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = ViewerLesson.objects.select_related('lesson').filter(user=2)
-
-    ''' Для упращения используется константа, при различных способах аутентификации user_id можно брать из токена или из request'''
-
     serializer_class = UserLessonsSerializer
+
+    def get_queryset(self):
+        queryset = ViewerLesson.objects.select_related('lesson').filter(user=2)
+        return queryset
 
 
 class ProductLessonsViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Product.objects.prefetch_related('lessons').filter(owners__name='Peter')
-
     serializer_class = ProductLessonsSerializer
+
+    def get_queryset(self):
+        queryset = Product.objects.prefetch_related('lessons').filter(owners__name='Peter')
+        return queryset
 
 
 @api_view(['GET'])
