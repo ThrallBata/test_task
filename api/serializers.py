@@ -11,17 +11,13 @@ class UserLessonsSerializer(serializers.ModelSerializer):
         fields = ('name', 'status', 'duration_view')
 
 
-class LessonsSerializer(serializers.ModelSerializer):
+class ProductLessonsSerializer(serializers.ModelSerializer):
+    status = serializers.CharField()
+    duration_view = serializers.IntegerField()
+    last_view = serializers.DateTimeField()
+
     class Meta:
         model = Lesson
-        fields = ('name', 'viewers',)
+        fields = ('name', 'status', 'duration_view', 'last_view')
 
-
-class ProductLessonsSerializer(serializers.ModelSerializer):
-
-    lesson = LessonsSerializer(many=True, read_only=True, source='lessons')
-
-    class Meta:
-        model = Product
-        fields = ('name', 'lesson')
 

@@ -5,7 +5,7 @@ from .views import UserLessonsViewSet, ProductLessonsViewSet, ProductStatisticsA
 
 router = routers.SimpleRouter()
 router.register('lessons', UserLessonsViewSet, 'lessons')
-# router.register(r'product', ProductLessonsViewSet)
+router.register('product', ProductLessonsViewSet, 'product')
 
 urlpatterns = [
     # path('v1/products/statistics/', ProductStatisticsAPIView),

@@ -1,6 +1,7 @@
 from django.db.models import Sum, FilteredRelation, Q, F
 
-from rest_framework import viewsets, status, mixins
+
+from rest_framework import viewsets, status, mixins, exceptions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -8,31 +9,35 @@ from .serializers import UserLessonsSerializer, ProductLessonsSerializer
 from .models import ViewerLesson, Product, User, ProductAccess, Lesson
 
 
+USER_ID = 1
+
+
+def get_product_accesses(user):
+    return ProductAccess.objects.filter(
+            user=user,
+            is_valid=True)
+
+
 class UserLessonsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = UserLessonsSerializer
 
     def get_queryset(self):
-        # TODO передача user_id с помощью выбранного способа аутентификации
+        # TODO передача USER_ID с помощью выбранного способа аутентификации
 
-        user_id = 1
-
-        accesses = ProductAccess.objects.filter(
-            user=user_id,
-            is_valid=True
-        )
+        accesses = get_product_accesses(USER_ID)
 
         queryset = Lesson.objects.filter(
             products__in=accesses.values('product_id')
         ).alias(
             view_info=FilteredRelation(
                 'views',
-                condition=Q(views__user=user_id)
+                condition=Q(views__user=USER_ID)
             )
         ).annotate(
             status=F('view_info__status'),
             duration_view=F('view_info__duration_view')
         )
-        print(accesses)
+
         return queryset
 
 
@@ -40,7 +45,25 @@ class ProductLessonsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ProductLessonsSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.prefetch_related('lessons').filter(owners__name='Peter')
+        product_id = self.request.data.get('product_id')
+        accesses = get_product_accesses(USER_ID)
+
+        if not (int(product_id) in accesses.values_list('product_id', flat=True)):
+            raise exceptions.NotFound
+
+        queryset = Lesson.objects.filter(
+            products=product_id
+        ).alias(
+            view_info=FilteredRelation(
+                'views',
+                condition=Q(views__user=USER_ID)
+            )
+        ).annotate(
+            status=F('view_info__status'),
+            duration_view=F('view_info__duration_view'),
+            last_view=F('view_info__last_view')
+        )
+
         return queryset
 
 
