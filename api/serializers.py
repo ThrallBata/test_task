@@ -21,3 +21,10 @@ class ProductLessonsSerializer(serializers.ModelSerializer):
         fields = ('name', 'status', 'duration_view', 'last_view')
 
 
+class ProductStatisticSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    lesson_view_count = serializers.IntegerField()
+    total_duration_view = serializers.IntegerField()
+    total_users_on_product = serializers.IntegerField()
+    buys_percent = serializers.FloatField()
+
